@@ -1,0 +1,113 @@
+server:
+  port: 8080
+  # servlet.context-path详细介绍地址：https://www.cnblogs.com/sedkyzx/p/15459985.html
+  # https://blog.csdn.net/qq_36371449/article/details/80314024
+  #servlet 可以用来配置全局的一些属性,这里的context-path是项目名的配置
+  servlet:
+    context-path:
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: xuliang!=O
+    #高版本的MySQL已经不需要填写serverTimezone=CTT
+    url: jdbc:mysql://localhost:3306/copy_echo?characterEncoding=utf-8&userSSL=false
+  # 关于elasticSearch的配置,设置节点名和端口 信息配置在安装包的bin目录下的elasticSearch.yml文件中了
+  #  一个节点配置对应一个.yml文件
+  data:
+    elasticsearch:
+      cluster-nodes: 127.0.0.1:9300
+      cluster-name: kaixin_cluster
+  redis:
+    host: localhost
+    port: 6379
+    database: 11
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: 2159289430@qq.com
+    password: jerjvldijprpeaja
+    protocol: smtp
+    default-encoding: utf-8
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+  thymeleaf:
+    cache: false
+    #  模板引擎配置
+  #  thymeleaf:
+  #    cache: true
+  #    enabled: true
+  #    mode: HTML
+  #    encoding: UTF-8
+  #    prefix: /resources/templates
+  #    suffix: .html
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      #3秒钟，一个 Consumer 将会提交它的 Offset 给 Kafka，或者每一次数据从指定的 Topic 取回时，将会提交最后一次的 Offset。
+      auto-commit-interval: 3000
+      group-id: test-consumer-group
+      enable-auto-commit: true  #该配置项的作用是当配置为true时，每次获取到消息后就会自动更新存储在zookepper中的offset值。
+  quartz:
+    job-store-type: jdbc
+    scheduler-name: communityScheduler
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            isClustered: true
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 5
+    #    jdbc:
+    #      initialize-schema: always
+
+    # https://blog.csdn.net/Vermont_/article/details/109118810 介绍classpath
+mybatis:
+  type-aliases-package: com.kaixin.copy_echo.entity
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    #    使用MyBatis往MySQL数据库中插入一条记录后，需要返回该条记录的自增主键值。
+    use-generated-keys: true
+    # 使用驼峰命名法
+    map-underscore-to-camel-case: true
+
+# caffeine 本地缓存配置的参数(自定义)
+caffeine:
+  posts:
+    max-size: 15  #最大存储条数
+    expire-seconds: 180  #帖子过期时间
+
+#自定义配置,该项目程序的域名
+community:
+  path:
+    domain: http://localhost
+    editormdUploadPath: D:/Echo-master/src/main/resources/static/editor-md-upload
+
+# 七牛云仓库
+qiniu:
+  key:
+    access: ZTsFgzFiXd0J0Dvct2AFT9HOPVi6Oncchhw2s3OO
+    secret: slJUGusn9RYZeaon449OAFNNZ2mcCQpDkOXbOXSK
+  bucket:
+    header:
+      name: echoblog-test
+#      url: http://qyy5r5n0l.hn-bkt.clouddn.com
+      url: http://qny.tv114.xyz
+
+#spring.quartz.job-store-type = jdbc
+#spring.quartz.scheduler-name = communityScheduler
+#spring.quartz.properties.org.quartz.scheduler.instanceId = AUTO
+#spring.quartz.properties.org.quartz.jobStore.class = org.quartz.impl.jdbcjobstore.JobStoreTX
+#spring.quartz.properties.org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+#spring.quartz.properties.org.quartz.jobStore.isClustered = true
+#spring.quartz.properties.org.quartz.threadPool.class = org.quartz.simpl.SimpleThreadPool
+#spring.quartz.properties.org.quartz.threadPool.threadCount = 5

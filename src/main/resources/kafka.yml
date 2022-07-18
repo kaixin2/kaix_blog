@@ -1,0 +1,52 @@
+version: '3.3'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    volumes:
+      - /opt/zookeeper/data:/data
+    container_name: zookeeper_nodes1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 2181:2181
+    restart: always
+  kafka_node1:
+    image: wurstmeister/kafka
+    container_name: kafka_node1
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+    volumes:
+      - /opt/kafka/data:/kafka
+    environment:
+      KAFKA_CREATE_TOPICS: "test"
+      KAFKA_BROKER_NO: 0
+      KAFKA_LISTENERS: PLAINTEXT://kafka_node1:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://121.41.90.228:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_HEAP_OPTS: "-Xmx512M -Xms16M"
+    restart: on-failure
+  kafka_manager:
+    image: hlebalbau/kafka-manager:stable
+    ports:
+      - 9000:9000
+    environment:
+      ZK_HOSTS: "zookeeper:2181"
+    depends_on:
+      - zookeeper
+      - kafka_node1
+    restart: on-failure
+## 3. 启动容器服务
+#  docker-compose -f /etc/kafka/kafka.yml up -d
+#
+#  --restart=always参数能够使我们在重启docker时，自动启动相关容器。
+#  Docker容器的重启策略如下：
+#  no，默认策略，在容器退出时不重启容器
+#  on-failure，在容器非正常退出时（退出状态非0），才会重启容器
+#  on-failure:3，在容器非正常退出时重启容器，最多重启3次
+#  always，在容器退出时总是重启容器
+#  unless-stopped，在容器退出时总是重启容器，但是不考虑在Docker守护进程启动时就已经停止了的容器
